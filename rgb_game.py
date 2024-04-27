@@ -118,7 +118,7 @@ class rgbGUI:
         userRGB = self.set_user_colour()
         userRGB_ctypes = getRGB(userRGB[0], userRGB[1], userRGB[2])
         otherRGB_ctypes = getRGB(self.rgb[0], self.rgb[1], self.rgb[2])
-        utils.getRGB_distance.restype = ctypes.c_int
+        otherRGB_ctypes.restype = ctypes.c_int
         self.difference = utils.getRGB_distance(userRGB_ctypes, otherRGB_ctypes)
 
         if self.developer_mode.get():
@@ -132,7 +132,7 @@ class rgbGUI:
         self.distanceLabel.config(
             text=f"({userRGB[0]-self.rgb[0]}, {userRGB[1]-self.rgb[1]}, {userRGB[2]-self.rgb[2]})"
         )
-        self.checkWin(self.difference)
+        self.check_win(self.difference)
 
     def new_game(self):
         self.tries = 0
@@ -142,7 +142,7 @@ class rgbGUI:
         self.triesLabel.config(text=f"Try: {self.tries}/5")
         self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
 
-    def checkWin(self, diff):
+    def check_win(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
             self.distanceLabel.config(text="Congrats! You won!")
             utils.free_memory(self.rgbAlloc)
@@ -161,7 +161,7 @@ class rgbGUI:
             )
             diff_value_info = f"Difference: {self.difference}"
         except AttributeError:
-            diff_info = "Difference: Null"
+            diff_info = "is Difference: Null"
             diff_value_info = "Difference: Null"
         return f"{rgb_info}\n{diff_info}\n{diff_value_info}"
 
