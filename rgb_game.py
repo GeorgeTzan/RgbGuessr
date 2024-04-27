@@ -20,15 +20,29 @@ class rgbGUI:
         self.root.resizable(False, False)
         self.root.title("RgbGeusser")
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.menubar = tk.Menu(self.root)
-        filemenu = tk.Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="New Game", command=self.new_game)
-        self.menubar.add_cascade(label="Menu", menu=filemenu)
-        self.root.config(menu=self.menubar)
-        self.scores = []
+
+        self.developer_mode = tk.BooleanVar()
+        self.developer_mode.trace_add("write", self.toggle_developer_mode)
+
         self.tries = 0
+        self.setup_menu()
+        self.setup_widgets()
+        self.scores = []
+        self.set_random_colour()
+
+        self.root.mainloop()
+
+    def setup_menu(self):
+        menubar = tk.Menu(self.root)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_checkbutton(label="Developer Mode", variable=self.developer_mode)
+        filemenu.add_command(label="New Game", command=self.new_game)
+        menubar.add_cascade(label="Menu", menu=filemenu)
+        self.root.config(menu=menubar)
+
+    def setup_widgets(self):
         self.submitColour = tk.Button(
-            self.root, text="Submit", command=self.runOnSubmit
+            self.root, text="Submit", command=self.run_on_submit
         )
         self.redSlider = tk.Scale(self.root, from_=0, to=255, orient=tk.HORIZONTAL)
         self.greenSlider = tk.Scale(self.root, from_=0, to=255, orient=tk.HORIZONTAL)
@@ -39,12 +53,13 @@ class rgbGUI:
         self.blueLabel = tk.Label(self.root, text="Blue", fg="blue")
 
         self.submitColour.place(relx=0.1, rely=0.35)
-        self.redSlider.place(relx=0.3, rely=0)
-        self.greenSlider.place(relx=0.3, rely=0.1)
-        self.blueSlider.place(relx=0.3, rely=0.2)
-        self.redLabel.place(relx=0.23, rely=0.05)
-        self.greenLabel.place(relx=0.2, rely=0.15)
-        self.blueLabel.place(relx=0.23, rely=0.25)
+        self.redSlider.place(relx=0.40, rely=0)
+        self.greenSlider.place(relx=0.4, rely=0.1)
+        self.blueSlider.place(relx=0.4, rely=0.2)
+
+        self.redLabel.place(relx=0.33, rely=0.05)
+        self.greenLabel.place(relx=0.3, rely=0.15)
+        self.blueLabel.place(relx=0.33, rely=0.25)
 
         self.triesLabel = tk.Label(self.root, text=f"Try: {self.tries}/5", fg="red")
         self.bestScoreLabel = tk.Label(self.root, text="Best Score: 0%", fg="green")
@@ -58,20 +73,27 @@ class rgbGUI:
         self.rectangleRand = self.randomisedColour.create_rectangle(
             0, 0, 170, 200, fill="red"
         )
-        self.randomisedColour.place(relx=0.01, rely=0.45)
+        self.randomisedColour.place(relx=0.01, rely=0.44)
+        self.randomisedColourLabel = tk.Label(self.root, text="Color Goal", fg="black")
+        self.randomisedColourLabel.place(relx=0.12, rely=0.949)
 
         self.userColour = tk.Canvas(self.root, width=200, height=200)
         self.userRect = self.userColour.create_rectangle(0, 0, 170, 200, fill="blue")
-        self.userColour.place(relx=0.55, rely=0.45)
-
-        self.setRandomColour()
-        self.root.mainloop()
+        self.userColour.place(relx=0.55, rely=0.44)
+        self.userColourLabel = tk.Label(
+            self.root, text="User's Color Selection:", fg="black"
+        )
+        self.userColourLabel.place(relx=0.63, rely=0.949)
 
     def on_closing(self):
         utils.free_memory(self.rgbAlloc)
         self.root.destroy()
 
-    def setRandomColour(self):
+    def toggle_developer_mode(self, *args):
+        if self.developer_mode.get():
+            print(self)
+
+    def set_random_colour(self):
         utils.random_rgb.restype = ctypes.POINTER(getRGB)
         self.rgbAlloc = utils.random_rgb()
         self.rgb = (
@@ -82,7 +104,7 @@ class rgbGUI:
         color = self.format_color(self.rgb)
         self.randomisedColour.itemconfig(self.rectangleRand, fill=color)
 
-    def setUserColour(self):
+    def set_user_colour(self):
         rgb = (self.redSlider.get(), self.greenSlider.get(), self.blueSlider.get())
         color = self.format_color(rgb)
         self.userColour.itemconfig(self.userRect, fill=color)
@@ -91,42 +113,57 @@ class rgbGUI:
     def format_color(self, rgb):
         return "#%02x%02x%02x" % rgb
 
-    def runOnSubmit(self):
+    def run_on_submit(self):
         self.tries += 1
-        userRGB = self.setUserColour()
+        userRGB = self.set_user_colour()
         userRGB_ctypes = getRGB(userRGB[0], userRGB[1], userRGB[2])
         otherRGB_ctypes = getRGB(self.rgb[0], self.rgb[1], self.rgb[2])
         utils.getRGB_distance.restype = ctypes.c_int
-        difference = utils.getRGB_distance(userRGB_ctypes, otherRGB_ctypes)
-        print(self.rgb[0], self.rgb[1], self.rgb[2])
-        print((difference <= MAX_COLOR_DIFF))
-        print(difference)
+        self.difference = utils.getRGB_distance(userRGB_ctypes, otherRGB_ctypes)
+
+        if self.developer_mode.get():
+            print(self.__str__())
+
         max_difference = utils.getRGB_distance(getRGB(255, 255, 255), getRGB(0, 0, 0))
-        percentage = (difference / max_difference) * 100
+        percentage = (self.difference / max_difference) * 100
         self.scores.append(percentage)
         self.triesLabel.config(text=f"Try: {self.tries}/5")
         self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
         self.distanceLabel.config(
             text=f"({userRGB[0]-self.rgb[0]}, {userRGB[1]-self.rgb[1]}, {userRGB[2]-self.rgb[2]})"
         )
-        self.checkWin(difference)
+        self.checkWin(self.difference)
 
     def new_game(self):
         self.tries = 0
         self.scores = [0]
         self.submitColour.place(relx=0.1, rely=0.35)
-        self.setRandomColour()
+        self.set_random_colour()
         self.triesLabel.config(text=f"Try: {self.tries}/5")
         self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
 
     def checkWin(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
-            print("Winner Winner chicken dinner")
+            self.distanceLabel.config(text="Congrats! You won!")
             utils.free_memory(self.rgbAlloc)
+            self.root.after(3000, self.new_game)
         elif self.tries > MAX_TRIES:
             self.submitColour.place_forget()
             utils.free_memory(self.rgbAlloc)
-            print("You've lost")
+            self.distanceLabel.config(text="Damn it! You lost!")
+            self.new_game()
+
+    def __str__(self):
+        rgb_info = f"RGB Values: ({self.rgb[0]}, {self.rgb[1]}, {self.rgb[2]})"
+        try:
+            diff_info = (
+                f"Is difference <= MAX_COLOR_DIFF: {self.difference <= MAX_COLOR_DIFF}"
+            )
+            diff_value_info = f"Difference: {self.difference}"
+        except AttributeError:
+            diff_info = "Difference: Null"
+            diff_value_info = "Difference: Null"
+        return f"{rgb_info}\n{diff_info}\n{diff_value_info}"
 
 
 rgbGUI()
