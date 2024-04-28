@@ -18,7 +18,7 @@ class rgbGUI:
         self.root = tk.Tk()
         self.root.geometry("400x400")
         self.root.resizable(False, False)
-        self.root.title("RgbGeusser")
+        self.root.title("RgbGeussr")
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.developer_mode = tk.BooleanVar()
@@ -125,7 +125,7 @@ class rgbGUI:
             print(self.__str__())
 
         max_difference = utils.getRGB_distance(getRGB(255, 255, 255), getRGB(0, 0, 0))
-        percentage = (self.difference / max_difference) * 100
+        percentage = 100 - ((self.difference / max_difference) * 100)
         self.scores.append(percentage)
         self.triesLabel.config(text=f"Try: {self.tries}/5")
         self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
@@ -136,11 +136,11 @@ class rgbGUI:
 
     def new_game(self):
         self.tries = 0
-        self.scores = [0]
+        self.scores = []
         self.submitColour.place(relx=0.1, rely=0.35)
         self.set_random_colour()
         self.triesLabel.config(text=f"Try: {self.tries}/5")
-        self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
+        # self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
 
     def check_win(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
