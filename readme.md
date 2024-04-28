@@ -24,7 +24,7 @@ To install RGB Guesser, follow these steps:
 2. Navigate to the project directory:
 
     ```bash
-    cd rgb-guesser
+    cd rgbguessr
     ```
 3. Compile the .so file:
     ```bash
