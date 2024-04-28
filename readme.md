@@ -1,9 +1,8 @@
-# RGB Guesser
+## RgbGuessr 🎨
 
-RGB Guesser is a simple game built using Python and Tkinter, with some functions running at the C level. Players try to guess the RGB values of a randomly generated color. This document provides an overview of the project, installation instructions, usage guidelines, features, and license information.
+Hey there! Welcome to RgbGuessr, my latest project that I worked on . I've used Python with Tkinter but also wrote some stuff in C level. I've cooked up a fun little game that's been a blast!
 
-
-## Table of Contents
+### Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -11,15 +10,16 @@ RGB Guesser is a simple game built using Python and Tkinter, with some functions
 - [Features](#features)
 - [License](#license)
 
-## Installation
+### Installation
 
-To install RGB Guesser, follow these steps:
+Getting RgbGuessr up and running is just as easy as counting from 1 to 5! Just follow these steps:
 
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/GeorgeTzan/RgbGuessr.git
-    ```
+1. **Clone the Repository:**
+   
+   Fire up your terminal and run this command:
+   ```bash
+   git clone https://github.com/GeorgeTzan/RgbGuessr.git
+   ```
 
 2. Navigate to the project directory:
 
@@ -38,15 +38,16 @@ To install RGB Guesser, follow these steps:
 
 ## Usage
 
-After installing RGB Guesser, follow the on-screen instructions to play the game.
+After installing RgbGuessr, follow the following instructions to play the game.
 
 ## How to Play
 
 1. Launch the game.
 2. Adjust the sliders to select your desired RGB values.
 3. Click the "Submit" button to submit your guess.
-4. The game will provide feedback on your guess.
+4. The game will provide feedback based on your guess.
 5. Try to guess the correct RGB values within the given number of tries to win the game.
+6. You only have a 10% RGB difference to guess the colour.
 
 ## Features
 
