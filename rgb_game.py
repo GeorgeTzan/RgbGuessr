@@ -147,14 +147,16 @@ class rgbGUI:
         self.set_random_colour()
         self.triesLabel.config(text=f"Try: {self.tries}/5")
         self.distanceLabel.config(bg=self.root.cget("bg"))
+        self.submitColour.config(state="normal")
 
     def check_win(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
             self.distanceLabel.config(text="Congrats! You won!", bg="green")
             utils.free_memory(self.rgbAlloc)
+            self.submitColour.config(state="disabled")
             self.root.after(3000, self.new_game)
         elif self.tries > MAX_TRIES:
-            self.submitColour.place_forget()
+            self.submitColour.config(state="disabled")
             utils.free_memory(self.rgbAlloc)
             self.distanceLabel.config(text="Damn it! You lost!", bg="red")
             self.root.after(3000, self.new_game)
