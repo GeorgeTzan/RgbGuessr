@@ -44,9 +44,15 @@ class rgbGUI:
         self.submitColour = tk.Button(
             self.root, text="Submit", command=self.run_on_submit
         )
-        self.redSlider = tk.Scale(self.root, from_=0, to=255, orient=tk.HORIZONTAL)
-        self.greenSlider = tk.Scale(self.root, from_=0, to=255, orient=tk.HORIZONTAL)
-        self.blueSlider = tk.Scale(self.root, from_=0, to=255, orient=tk.HORIZONTAL)
+        self.redSlider = tk.Scale(
+            self.root, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_color
+        )
+        self.greenSlider = tk.Scale(
+            self.root, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_color
+        )
+        self.blueSlider = tk.Scale(
+            self.root, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_color
+        )
 
         self.redLabel = tk.Label(self.root, text="Red", fg="red")
         self.greenLabel = tk.Label(self.root, text="Green", fg="green")
@@ -77,8 +83,8 @@ class rgbGUI:
         self.randomisedColourLabel = tk.Label(self.root, text="Color Goal", fg="black")
         self.randomisedColourLabel.place(relx=0.12, rely=0.949)
 
-        self.userColour = tk.Canvas(self.root, width=200, height=200)
-        self.userRect = self.userColour.create_rectangle(0, 0, 170, 200, fill="blue")
+        self.userColour = tk.Canvas(self.root, width=200, height=200, bg="white")
+        self.userRect = self.userColour.create_rectangle(0, 0, 170, 200, fill="white")
         self.userColour.place(relx=0.55, rely=0.44)
         self.userColourLabel = tk.Label(
             self.root, text="User's Color Selection:", fg="black"
@@ -140,18 +146,23 @@ class rgbGUI:
         self.submitColour.place(relx=0.1, rely=0.35)
         self.set_random_colour()
         self.triesLabel.config(text=f"Try: {self.tries}/5")
-        # self.bestScoreLabel.config(text=f"Best Score: {max(self.scores):.1f}%")
+        self.distanceLabel.config(bg=self.root.cget("bg"))
 
     def check_win(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
-            self.distanceLabel.config(text="Congrats! You won!")
+            self.distanceLabel.config(text="Congrats! You won!", bg="green")
             utils.free_memory(self.rgbAlloc)
             self.root.after(3000, self.new_game)
         elif self.tries > MAX_TRIES:
             self.submitColour.place_forget()
             utils.free_memory(self.rgbAlloc)
-            self.distanceLabel.config(text="Damn it! You lost!")
-            self.new_game()
+            self.distanceLabel.config(text="Damn it! You lost!", bg="red")
+            self.root.after(3000, self.new_game)
+
+    def update_color(self, *args):
+        rgb = (self.redSlider.get(), self.greenSlider.get(), self.blueSlider.get())
+        color = self.format_color(rgb)
+        self.userColour.itemconfig(self.userRect, fill=color)
 
     def __str__(self):
         rgb_info = f"RGB Values: ({self.rgb[0]}, {self.rgb[1]}, {self.rgb[2]})"
