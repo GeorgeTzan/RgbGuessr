@@ -25,9 +25,9 @@ class rgbGUI:
         self.developer_mode.trace_add("write", self.toggle_developer_mode)
 
         self.tries = 0
+        self.scores = []
         self.setup_menu()
         self.setup_widgets()
-        self.scores = []
         self.set_random_colour()
 
         self.root.mainloop()
@@ -80,7 +80,7 @@ class rgbGUI:
             0, 0, 170, 200, fill="red"
         )
         self.randomisedColour.place(relx=0.01, rely=0.44)
-        self.randomisedColourLabel = tk.Label(self.root, text="Color Goal", fg="black")
+        self.randomisedColourLabel = tk.Label(self.root, text="Color Goal:", fg="black")
         self.randomisedColourLabel.place(relx=0.12, rely=0.949)
 
         self.userColour = tk.Canvas(self.root, width=200, height=200, bg="white")
@@ -141,6 +141,7 @@ class rgbGUI:
         self.check_win(self.difference)
 
     def new_game(self):
+        utils.free_memory(self.rgbAlloc)
         self.tries = 0
         self.scores = []
         self.submitColour.place(relx=0.1, rely=0.35)
@@ -152,13 +153,11 @@ class rgbGUI:
     def check_win(self, diff):
         if diff <= MAX_COLOR_DIFF and self.tries <= 5:
             self.distanceLabel.config(text="Congrats! You won!", bg="green")
-            utils.free_memory(self.rgbAlloc)
             self.submitColour.config(state="disabled")
             self.root.after(3000, self.new_game)
         elif self.tries > MAX_TRIES:
-            self.submitColour.config(state="disabled")
-            utils.free_memory(self.rgbAlloc)
             self.distanceLabel.config(text="Damn it! You lost!", bg="red")
+            self.submitColour.config(state="disabled")
             self.root.after(3000, self.new_game)
 
     def update_color(self, *args):
